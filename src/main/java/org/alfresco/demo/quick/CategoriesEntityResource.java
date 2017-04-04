@@ -1,5 +1,6 @@
 package org.alfresco.demo.quick;
 
+import static org.alfresco.demo.quick.CategoriesHelper.toCategories;
 import org.alfresco.model.ContentModel;
 import org.alfresco.query.PagingRequest;
 import org.alfresco.query.PagingResults;
@@ -33,10 +34,7 @@ public class CategoriesEntityResource implements EntityResourceAction.Read<Categ
     {
         PagingRequest pagingRequest = Util.getPagingRequest(parameters.getPaging());
         PagingResults<ChildAssociationRef> pagingResults = categoryService.getRootCategories(StoreRef.STORE_REF_WORKSPACE_SPACESSTORE, ContentModel.ASPECT_GEN_CLASSIFIABLE, pagingRequest, true);
-        List<Category> result = new ArrayList<>(pagingResults.getPage().size());
-        pagingResults.getPage().forEach(item -> {
-            result.add(new Category(item.getChildRef(), item.getQName().getLocalName()));
-        });
+        List<Category> result = toCategories(pagingResults.getPage());
         return CollectionWithPagingInfo.asPaged(parameters.getPaging(), result, pagingResults.hasMoreItems(), pagingResults.getTotalResultCount().getFirst());
 
     }
