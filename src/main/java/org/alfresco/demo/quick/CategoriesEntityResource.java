@@ -4,6 +4,7 @@ import static org.alfresco.demo.quick.CategoriesHelper.toCategories;
 import org.alfresco.model.ContentModel;
 import org.alfresco.query.PagingRequest;
 import org.alfresco.query.PagingResults;
+import org.alfresco.rest.api.Nodes;
 import org.alfresco.rest.api.impl.Util;
 import org.alfresco.rest.framework.resource.EntityResource;
 import org.alfresco.rest.framework.resource.actions.interfaces.EntityResourceAction;
@@ -24,11 +25,16 @@ import java.util.List;
  * Rest API endpoint for "categories"
  */
 @EntityResource(name="categories", title = "Categories")
-public class CategoriesEntityResource implements EntityResourceAction.Read<Category>, EntityResourceAction.Create<Category>
+public class CategoriesEntityResource implements EntityResourceAction.Read<Category>,
+                                                 EntityResourceAction.Create<Category>,
+                                                 EntityResourceAction.Delete
 {
 
     @Autowired
     private CategoryService categoryService;
+
+    @Autowired
+    private Nodes nodes;
 
     @Override
     public CollectionWithPagingInfo<Category> readAll(Parameters parameters)
@@ -50,5 +56,12 @@ public class CategoriesEntityResource implements EntityResourceAction.Read<Categ
             result.add(new Category(created,newCategory.getName()));
         }
         return result;
+    }
+
+    @Override
+    public void delete(String categoryId, Parameters parameters)
+    {
+        NodeRef nodeRef = nodes.validateOrLookupNode(categoryId, null);
+        categoryService.deleteCategory(nodeRef);
     }
 }
