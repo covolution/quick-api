@@ -11,9 +11,23 @@ public class Category
     protected NodeRef nodeRef;
     protected String name;
 
+    public Category()
+    {
+    }
+
     public Category(NodeRef nodeRef, String name)
     {
         this.nodeRef = nodeRef;
+        this.name = name;
+    }
+
+    public void setNodeRef(NodeRef nodeRef)
+    {
+        this.nodeRef = nodeRef;
+    }
+
+    public void setName(String name)
+    {
         this.name = name;
     }
 

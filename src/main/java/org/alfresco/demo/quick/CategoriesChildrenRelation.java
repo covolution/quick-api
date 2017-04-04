@@ -12,6 +12,7 @@ import org.alfresco.service.cmr.repository.NodeRef;
 import org.alfresco.service.cmr.search.CategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -19,7 +20,7 @@ import java.util.List;
  * An endpoint for /-default-/private/mycompany/versions/1/categories/[categoryId]/children
  */
 @RelationshipResource(name = "children", entityResource = CategoriesEntityResource.class, title = "Category children")
-public class CategoriesChildrenRelation implements RelationshipResourceAction.Read<Category>
+public class CategoriesChildrenRelation implements RelationshipResourceAction.Read<Category>, RelationshipResourceAction.Create<Category>
 {
 
     @Autowired
@@ -35,5 +36,18 @@ public class CategoriesChildrenRelation implements RelationshipResourceAction.Re
         Collection<ChildAssociationRef> children = categoryService.getChildren(nodeRef, CategoryService.Mode.SUB_CATEGORIES, CategoryService.Depth.IMMEDIATE);
         List<Category> result = toCategories(children);
         return CollectionWithPagingInfo.asPaged(parameters.getPaging(), result);
+    }
+
+    @Override
+    public List<Category> create(String parentCategoryId, List<Category> categories, Parameters parameters)
+    {
+        NodeRef nodeRef = nodes.validateOrLookupNode(parentCategoryId, null);
+        List<Category> result = new ArrayList<>(categories.size());
+        for (Category newCategory:categories)
+        {
+            NodeRef created = categoryService.createCategory(nodeRef, newCategory.getName());
+            result.add(new Category(created,newCategory.getName()));
+        }
+        return result;
     }
 }
